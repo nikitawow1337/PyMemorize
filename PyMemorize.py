@@ -12,6 +12,7 @@ class Dict:
     dict1 = list()
     dict2 = list()
     words = 0
+    randst = True
 
 
 def __init__():
@@ -60,6 +61,13 @@ def srandom(percentage):
     return samplerand
 
 
+def sinitial(percentage):
+    sampleinit = list(range(0, int(Dict.words * percentage)))
+    print("Type: ", type(sampleinit))
+    print("Sample length: ", len(sampleinit))
+    return sampleinit
+
+
 def memorize(x):
     index = 1
     for i in x:
@@ -104,27 +112,45 @@ def dic_load():
 
 
 def play_memorization_game():
-    print("Percentage?")
+    print("Percentage? (from 0 to 1)")
     s = float(input())
-    x = srandom(s)
+    if Dict.randst == True:
+        x = srandom(s)
+    else:
+        x = sinitial(s)
     memorize(x)
 
 
 def play_test_your_skills_game():
-    print("Percentage?")
+    print("Percentage? (from 0 to 1)")
     s = float(input())
     x = srandom(s)
     check(x)
 
 
 def play_watch_and_learn_game():
-    print("Percentage?")
+    print("Percentage? (from 0 to 1)")
     s = float(input())
     x = srandom(s)
     memorize(x)
     for _ in x:
         print("|\n")
     check(x)
+
+
+def show_random_statement():
+    print("Your random statement is ", Dict.randst)
+
+
+def set_random_statement():
+    print("What random statement do you want to set?")
+    print("0 - all dictionaries will be shown in initial order")
+    print("1 - all dictionaries will be shown in random order")
+    s = input()
+    if s == '0':
+        Dict.randst = False
+    if s == '1':
+        Dict.randst = True
 
 
 def enter(argument):
@@ -142,6 +168,10 @@ def enter(argument):
         play_test_your_skills_game()
     elif argument == '7':
         play_watch_and_learn_game()
+    elif argument == '100':
+        show_random_statement()
+    elif argument == '101':
+        set_random_statement()
     elif argument == '0':
         exit(0)
 
@@ -156,6 +186,9 @@ def menu():
             "5) Play 'Memorization' game\n"
             "6) Play 'Test your skills' game\n"
             "7) Play 'Watch and learn' game\n"
+            "100) Show random statement\n"
+            "101) Set random statement\n"
+            "Add a splitter? Split dictionary on some equal parts for example\n"
             "0) Exit\n"
             "Enter: ")
         s = input()
