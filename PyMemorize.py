@@ -107,6 +107,7 @@ def dic_swap():
 
 
 def dic_load():
+    print("Write path to dictionary: ")
     s = input()
     parse(s)
 
