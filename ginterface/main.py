@@ -1,4 +1,5 @@
 import sys
+import random
 
 from PySide2.QtCore import QObject, Signal, Property, QUrl
 from PySide2.QtGui import QGuiApplication
@@ -16,6 +17,12 @@ class Dict:
     randst = True
     cur = 0
 
+
+def srandom():
+    percentage = float(input("Enter sample percentage"))
+    samplerand = random.sample(list(range(0, Dict.words)), int(Dict.words * percentage))
+    print("Sample length: ", len(samplerand))
+    print("Samplerand: ", samplerand)
 
 def parse(*path):
     Dict.dict_path = "dictionary.txt"
@@ -58,9 +65,6 @@ def parse(*path):
     print(Dict.words)
 
 
-# def ch():
-
-
 class Backend(QObject):
     textChanged = Signal(str)
 
@@ -81,12 +85,15 @@ class Backend(QObject):
         QObject.__init__(self, parent)
         self.m_text1 = Dict.dict1[Dict.cur]
         self.m_text2 = Dict.dict2[Dict.cur]
-        self.m_len1 = str(Dict.len1[Dict.cur])
-        self.m_len2 = str(Dict.len2[Dict.cur])
+
         self.m_cur = 0
-        self.m_word = "asd"
-        print(self.m_len2)
-        self.m_red = 0
+        self.m_word = ""
+
+        self.m_len1 = str(len(Dict.dict1[Dict.cur]))
+        self.m_len2 = str(len(Dict.dict2[Dict.cur]))
+        print(self.m_len1, self.m_len2)
+
+        self.m_red = str(0)
 
     @Property(str, notify=textChanged)
     def text1(self):
@@ -95,6 +102,10 @@ class Backend(QObject):
     @Property(str, notify=textChanged)
     def text2(self):
         return self.m_text2
+
+    @Property(str, notify=textChanged)
+    def word(self):
+        return self.m_word
 
     @Property(str, notify=textChanged)
     def len1(self):
@@ -108,19 +119,6 @@ class Backend(QObject):
     def red(self):
         return self.m_red
 
-    @Property(str, notify=textChanged)
-    def word(self):
-        # print(self.m_word)
-        return self.m_word
-
-    @Property(str, notify=textChanged)
-    def cur(self):
-        # if
-        self.m_cur += 1
-        Dict.cur = self.m_cur
-        # print(Dict.dict1[Dict.cur])
-        self.m_text1 = Dict.dict1[Dict.cur]
-        return self.m_cur
 
     @word.setter
     def setText(self, word):
@@ -128,15 +126,26 @@ class Backend(QObject):
             return
         self.m_word = word
         self.textChanged.emit(self.m_word)
-        if self.m_word == Dict.dict2[Dict.cur]:
-            self.m_cur += 1
-            Dict.cur = self.m_cur
-            self.m_text1 = Dict.dict1[Dict.cur]
-            self.m_word = ""
-
+        print("LEN: ", len(self.m_word), len(Dict.dict2[Dict.cur]))
+        if len(self.m_word) == len(Dict.dict2[Dict.cur]):
+            if self.m_word == Dict.dict2[Dict.cur]:
+                self.m_cur += 1
+                if self.m_cur == Dict.words:
+                    self.m_cur = 0
+                Dict.cur = self.m_cur
+                self.m_text1 = Dict.dict1[Dict.cur]
+                self.m_len1 = str(len(Dict.dict1[Dict.cur]))
+                self.m_len2 = str(len(Dict.dict2[Dict.cur]))
+                self.m_word = ""
+                self.m_red = str(0)
+            else:
+                self.m_red = str(1)
+        else:
+            self.m_red = str(0)
 
 def __init__():
     parse()
+    # srandom()
 
 
 if __name__ == '__main__':
@@ -144,7 +153,7 @@ if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
     backend = Backend()
 
-    #backend.textChanged.connect(lambda text: print(text))
+    # backend.textChanged.connect(lambda text: print(text))
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("backend", backend)
     engine.load(QUrl.fromLocalFile('main.qml'))
