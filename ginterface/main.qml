@@ -1,6 +1,7 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.1
 import QtQuick.Window 2.2
+//import "func.js" as MyScript
 
 ApplicationWindow {
     id: window
@@ -36,7 +37,45 @@ ApplicationWindow {
         z: 100
         //text: backend.len2
         //text: backend.word
-        text: backend.red
+        //text: backend.red
+        text: backend.text2
+        visible: false
+    }
+
+    Text {
+        id: counter
+        color: "green"
+        x: parent.width - 20
+        y: 0
+        z: 101
+        text: backend.cur
+        //anchors.left: window.right
+    }
+
+    Button {
+        id: btn
+        x: parent.width / 2 - btn.width / 2
+        width: parent.width / 10
+        height: parent.height / 15
+        text: "<font color='#ffffff'>" + "Hint"
+        font.family: "Arial"
+        focus: true
+        onClicked: {
+
+            if (debug.visible) {
+                debug.visible = false
+                btn.text = "<font color='#ffffff'>" + "Hint"
+            }
+            else {
+                debug.visible = true
+                btn.text = "<font color='#000000'>" + "Hint"
+            }
+        }
+    }
+
+    Item {
+    focus: true
+
     }
 
     Rectangle {
@@ -62,10 +101,28 @@ ApplicationWindow {
                 text.text = backend.text1
                 // red border
                 brdr = backend.red
+                // text2 hint
+                debug.text = backend.text2
+                // current word hint
+                counter.text = backend.cur
             }
+            Keys.onPressed:
+                if ((event.key == Qt.Key_F1))
+                    if (debug.visible) {
+                        debug.visible = false
+                        btn.text = "<font color='#ffffff'>" + "Hint"
+                    }
+                    else {
+                        debug.visible = true
+                        btn.text = "<font color='#000000'>" + "Hint"
+                    }
+
         }
+
     }
 }
+
+
 
 //function cpointSize(w, h, len) {
 //    c = 0

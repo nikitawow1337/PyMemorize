@@ -1,5 +1,6 @@
 import sys
 import random
+import json
 
 from PySide2.QtCore import QObject, Signal, Property, QUrl
 from PySide2.QtGui import QGuiApplication
@@ -18,14 +19,29 @@ class Dict:
     cur = 0
 
 
-def srandom():
-    percentage = float(input("Enter sample percentage"))
+def load_config():
+    with open("config.json", "r") as write_file:
+        d = json.loads(write_file, encoding="utf-8")
+    print(d)
+
+
+def randomize():
+    # percentage = float(input("Enter sample percentage"))
+    percentage = 1
     samplerand = random.sample(list(range(0, Dict.words)), int(Dict.words * percentage))
     print("Sample length: ", len(samplerand))
     print("Samplerand: ", samplerand)
+    # randomize
+    temp1 = Dict.dict1
+    temp2 = Dict.dict2
+    for i in range(len(samplerand)):
+        Dict.dict1.insert(i, temp1[samplerand[i]])
+        Dict.dict2.insert(i, temp2[samplerand[i]])
+
 
 def parse(*path):
-    Dict.dict_path = "dictionary.txt"
+    # Dict.dict_path = "dictionaries/dict3000rev.txt"
+    Dict.dict_path = "jap-dir.txt"
     if path and path != ():
         Dict.dict_path = path[0]
     print("file_path: ", Dict.dict_path)
@@ -111,13 +127,17 @@ class Backend(QObject):
     def len1(self):
         return self.m_len1
 
-    @Property(str, notify=textChanged)
+    @Property (str, notify=textChanged)
     def len2(self):
         return self.m_len2
 
     @Property(str, notify=textChanged)
     def red(self):
         return self.m_red
+
+    @Property(str, notify=textChanged)
+    def cur(self):
+        return str(self.m_cur + 1)
 
 
     @word.setter
@@ -126,14 +146,16 @@ class Backend(QObject):
             return
         self.m_word = word
         self.textChanged.emit(self.m_word)
-        print("LEN: ", len(self.m_word), len(Dict.dict2[Dict.cur]))
+        # print("LEN: ", len(self.m_word), len(Dict.dict2[Dict.cur]))
         if len(self.m_word) == len(Dict.dict2[Dict.cur]):
             if self.m_word == Dict.dict2[Dict.cur]:
+                # m_cur in case of order (or random)
                 self.m_cur += 1
                 if self.m_cur == Dict.words:
                     self.m_cur = 0
                 Dict.cur = self.m_cur
                 self.m_text1 = Dict.dict1[Dict.cur]
+                self.m_text2 = Dict.dict2[Dict.cur]
                 self.m_len1 = str(len(Dict.dict1[Dict.cur]))
                 self.m_len2 = str(len(Dict.dict2[Dict.cur]))
                 self.m_word = ""
@@ -143,9 +165,11 @@ class Backend(QObject):
         else:
             self.m_red = str(0)
 
+
 def __init__():
+    load_config()
     parse()
-    # srandom()
+    randomize()
 
 
 if __name__ == '__main__':
