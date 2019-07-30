@@ -1,0 +1,8 @@
+{
+	"config": {
+		"random": true,
+		"filename": "jap-dir.txt",
+		"hints": true,
+		"hint_button": "F1"
+	}
+}
