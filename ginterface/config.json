@@ -1,8 +1,7 @@
 {
 	"config": {
+		"filename": "dictionaries/dict3000.txt",
 		"random": true,
-		"filename": "jap-dir.txt",
-		"hints": true,
 		"hint_button": "F1"
 	}
 }

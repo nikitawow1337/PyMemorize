@@ -8,21 +8,27 @@ from PySide2.QtQml import QQmlApplicationEngine
 
 
 class Dict:
-    dict_path = ""
+    dict_path = "dict.txt"
     dict_name = ""
     dict1 = list()
     dict2 = list()
     len1 = list()
     len2 = list()
     words = 0
-    randst = True
+    rand_state = True
     cur = 0
+    # hints = True
+    hints_button = "F1"
 
 
 def load_config():
     with open("config.json", "r") as write_file:
-        d = json.loads(write_file, encoding="utf-8")
-    print(d)
+        data = json.load(write_file, encoding="utf-8")
+
+    Dict.dict_path = data["config"]["filename"]
+    Dict.rand_state = data["config"]["random"]
+    # Dict.hints = data["config"]["hints"]
+    Dict.hints_button = data["config"]["hint_button"]
 
 
 def randomize():
@@ -34,14 +40,16 @@ def randomize():
     # randomize
     temp1 = Dict.dict1
     temp2 = Dict.dict2
+    Dict.dict1 = list()
+    Dict.dict2 = list()
     for i in range(len(samplerand)):
         Dict.dict1.insert(i, temp1[samplerand[i]])
         Dict.dict2.insert(i, temp2[samplerand[i]])
+    print(Dict.dict1)
+    print(Dict.dict2)
 
 
 def parse(*path):
-    # Dict.dict_path = "dictionaries/dict3000rev.txt"
-    Dict.dict_path = "jap-dir.txt"
     if path and path != ():
         Dict.dict_path = path[0]
     print("file_path: ", Dict.dict_path)
@@ -75,9 +83,13 @@ def parse(*path):
     f.close()
 
     print("First dictionary: ", Dict.dict1)
-    print("First length: ", Dict.len1)
+    print("First words length: ", Dict.len1)
     print("Second dictionary: ", Dict.dict2)
-    print("Second length: ", Dict.len2)
+    print("Second words length: ", Dict.len2)
+
+    if Dict.rand_state:
+        randomize()
+
     print(Dict.words)
 
 
@@ -111,6 +123,8 @@ class Backend(QObject):
 
         self.m_red = str(0)
 
+        self.m_key = Dict.hints_button
+
     @Property(str, notify=textChanged)
     def text1(self):
         return self.m_text1
@@ -139,6 +153,11 @@ class Backend(QObject):
     def cur(self):
         return str(self.m_cur + 1)
 
+    @Property(str, notify=textChanged)
+    def key(self):
+        print(str("Qt.Key_" + self.m_key))
+        return str("Qt.Key_" + self.m_key)
+
 
     @word.setter
     def setText(self, word):
@@ -149,7 +168,6 @@ class Backend(QObject):
         # print("LEN: ", len(self.m_word), len(Dict.dict2[Dict.cur]))
         if len(self.m_word) == len(Dict.dict2[Dict.cur]):
             if self.m_word == Dict.dict2[Dict.cur]:
-                # m_cur in case of order (or random)
                 self.m_cur += 1
                 if self.m_cur == Dict.words:
                     self.m_cur = 0
@@ -169,7 +187,6 @@ class Backend(QObject):
 def __init__():
     load_config()
     parse()
-    randomize()
 
 
 if __name__ == '__main__':
